@@ -1,0 +1,1268 @@
+<!-- FILE: ImportSidebar.html - DRAG & DROP RESUME UPLOAD VERSION -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!-- PDF.js for PDF text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Mammoth.js for DOCX text extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <style>
+      :root {
+        --google-blue: #1a73e8;
+        --google-blue-hover: #1557b0;
+        --google-grey-100: #f8f9fa;
+        --google-grey-200: #e8eaed;
+        --google-grey-300: #dadce0;
+        --google-grey-500: #9aa0a6;
+        --google-grey-700: #5f6368;
+        --google-grey-900: #202124;
+        --border-color: #dadce0;
+        --background-color: #f8f9fa;
+        --success-color: #1e8e3e;
+        --success-bg: #e6f4ea;
+        --error-color: #d93025;
+        --error-bg: #fce8e6;
+        --info-color: #1a73e8;
+        --info-bg: #e8f0fe;
+        --warning-color: #f9ab00;
+        --warning-bg: #fef7e0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+        padding: 0;
+        margin: 0;
+        background-color: var(--background-color);
+        color: var(--google-grey-900);
+      }
+      h4 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--google-grey-900);
+        margin: 16px 0 8px 0;
+        letter-spacing: 0.1px;
+      }
+      p, li, ol {
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--google-grey-700);
+      }
+      .section-title {
+        color: var(--google-blue);
+        font-size: 14px;
+        font-weight: 600;
+        margin: 20px 0 12px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .section-title .material-symbols-outlined {
+        font-size: 20px;
+      }
+      ul, ol {
+        padding-left: 20px;
+        margin: 10px 0;
+      }
+      li {
+        margin-bottom: 6px;
+      }
+      textarea {
+        width: 100%;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 12px;
+        padding: 12px;
+        margin-top: 8px;
+        transition: all 0.2s;
+        background: white;
+        resize: vertical;
+      }
+      textarea:focus {
+        border-color: var(--google-blue);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+      }
+      button {
+        background: var(--google-blue);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+      button:hover:not(:disabled) {
+        background: var(--google-blue-hover);
+        box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+      }
+      button:disabled {
+        background: var(--google-grey-300);
+        color: var(--google-grey-500);
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .btn-full {
+        width: 100%;
+        margin-top: 16px;
+      }
+      .btn-secondary {
+        background: white;
+        color: var(--google-blue);
+        border: 1px solid var(--google-blue);
+      }
+      .btn-secondary:hover:not(:disabled) {
+        background: rgba(26, 115, 232, 0.04);
+        box-shadow: none;
+      }
+      .btn-small {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      /* Status messages */
+      .status-message {
+        margin-top: 16px;
+        font-size: 13px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        display: none;
+        line-height: 1.5;
+      }
+      .status-message.show { display: block; }
+      .status-message.success { color: var(--success-color); background-color: var(--success-bg); border-left: 4px solid var(--success-color); }
+      .status-message.error { color: var(--error-color); background-color: var(--error-bg); border-left: 4px solid var(--error-color); }
+      .status-message.info { color: var(--info-color); background-color: var(--info-bg); border-left: 4px solid var(--info-color); }
+      .status-message.warning { color: #b06000; background-color: var(--warning-bg); border-left: 4px solid var(--warning-color); }
+
+      /* Tab bar */
+      .tab-bar {
+        display: flex;
+        background: white;
+        border-bottom: 1px solid var(--border-color);
+        padding: 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      .tab {
+        flex: 1;
+        padding: 14px 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        color: var(--google-grey-700);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+        text-align: center;
+      }
+      .tab:hover {
+        color: var(--google-blue);
+        background: rgba(26, 115, 232, 0.04);
+      }
+      .tab.active {
+        color: var(--google-blue);
+        border-bottom-color: var(--google-blue);
+      }
+      .tab .material-symbols-outlined {
+        font-size: 22px;
+      }
+      .tab-content {
+        display: none;
+        padding: 16px;
+        animation: fadeIn 0.2s;
+      }
+      .tab-content.active { display: block; }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .material-symbols-outlined {
+        font-size: 20px;
+        vertical-align: middle;
+      }
+
+      /* Option cards */
+      .option-card {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        transition: all 0.2s;
+      }
+      .option-card:hover {
+        border-color: var(--google-blue);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .option-card h4 {
+        margin: 0 0 8px 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+      .option-card h4 .material-symbols-outlined {
+        color: var(--google-blue);
+      }
+      .option-card p {
+        margin: 0;
+      }
+
+      /* Tip box */
+      .tip-box {
+        background: var(--info-bg);
+        border-radius: 8px;
+        padding: 12px;
+        margin: 12px 0;
+        font-size: 12px;
+        color: var(--google-grey-700);
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .tip-box .material-symbols-outlined {
+        color: var(--info-color);
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .tip-box code {
+        background: rgba(0,0,0,0.06);
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-family: 'Roboto Mono', monospace;
+        font-size: 11px;
+      }
+
+      /* File type badges */
+      .file-types {
+        display: flex;
+        gap: 6px;
+        margin: 12px 0;
+        flex-wrap: wrap;
+      }
+      .file-type-badge {
+        background: var(--google-grey-200);
+        color: var(--google-grey-700);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      /* Drop zone */
+      .drop-zone {
+        border: 2px dashed var(--border-color);
+        border-radius: 12px;
+        padding: 32px 20px;
+        text-align: center;
+        background: white;
+        transition: all 0.2s;
+        cursor: pointer;
+        margin: 16px 0;
+      }
+      .drop-zone:hover {
+        border-color: var(--google-blue);
+        background: rgba(26, 115, 232, 0.02);
+      }
+      .drop-zone.drag-over {
+        border-color: var(--google-blue);
+        background: var(--info-bg);
+        border-style: solid;
+      }
+      .drop-zone.has-files {
+        padding: 16px;
+        border-style: solid;
+        border-color: var(--google-grey-300);
+      }
+      .drop-zone-icon {
+        font-size: 48px !important;
+        color: var(--google-grey-500);
+        margin-bottom: 12px;
+      }
+      .drop-zone.drag-over .drop-zone-icon {
+        color: var(--google-blue);
+      }
+      .drop-zone-text {
+        font-size: 14px;
+        color: var(--google-grey-700);
+        margin-bottom: 8px;
+      }
+      .drop-zone-subtext {
+        font-size: 12px;
+        color: var(--google-grey-500);
+      }
+      .drop-zone-subtext a {
+        color: var(--google-blue);
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .drop-zone-subtext a:hover {
+        text-decoration: underline;
+      }
+
+      /* File list */
+      .file-list {
+        max-height: 200px;
+        overflow-y: auto;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .file-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        background: var(--google-grey-100);
+        border-radius: 8px;
+        margin-bottom: 6px;
+        font-size: 13px;
+        gap: 10px;
+      }
+      .file-item:last-child {
+        margin-bottom: 0;
+      }
+      .file-item .material-symbols-outlined {
+        font-size: 18px;
+        color: var(--google-grey-700);
+      }
+      .file-item .file-name {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--google-grey-900);
+      }
+      .file-item .file-status {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 500;
+      }
+      .file-item .file-status.pending {
+        background: var(--google-grey-200);
+        color: var(--google-grey-700);
+      }
+      .file-item .file-status.processing {
+        background: var(--info-bg);
+        color: var(--info-color);
+      }
+      .file-item .file-status.success {
+        background: var(--success-bg);
+        color: var(--success-color);
+      }
+      .file-item .file-status.error {
+        background: var(--error-bg);
+        color: var(--error-color);
+      }
+      .file-item .remove-btn {
+        background: none;
+        border: none;
+        padding: 4px;
+        cursor: pointer;
+        color: var(--google-grey-500);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: none;
+      }
+      .file-item .remove-btn:hover {
+        background: var(--google-grey-200);
+        color: var(--error-color);
+      }
+      .file-item .remove-btn .material-symbols-outlined {
+        font-size: 16px;
+      }
+
+      /* File list header */
+      .file-list-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .file-list-header span {
+        font-size: 12px;
+        color: var(--google-grey-700);
+        font-weight: 500;
+      }
+
+      /* Progress bar */
+      .progress-container {
+        margin-top: 16px;
+        display: none;
+      }
+      .progress-container.show {
+        display: block;
+      }
+      .progress-label {
+        font-size: 12px;
+        color: var(--google-grey-700);
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+      }
+      .progress-bar {
+        width: 100%;
+        height: 6px;
+        background: var(--google-grey-200);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: var(--google-blue);
+        width: 0%;
+        transition: width 0.3s;
+        border-radius: 3px;
+      }
+
+      /* Hidden file input */
+      #file-input {
+        display: none;
+      }
+
+      /* Results section */
+      .results-section {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
+      }
+      .results-summary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .result-stat {
+        text-align: center;
+        padding: 12px 8px;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+      .result-stat .number {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--google-grey-900);
+      }
+      .result-stat .label {
+        font-size: 11px;
+        color: var(--google-grey-700);
+        margin-top: 2px;
+      }
+      .result-stat.success .number { color: var(--success-color); }
+      .result-stat.warning .number { color: var(--warning-color); }
+      .result-stat.error .number { color: var(--error-color); }
+    </style>
+  </head>
+  <body>
+    <div class="tab-bar">
+      <div class="tab active" data-tab="start-here">
+        <span class="material-symbols-outlined">info</span>
+        Get Started
+      </div>
+      <div class="tab" data-tab="import-data">
+        <span class="material-symbols-outlined">content_paste</span>
+        Paste Data
+      </div>
+      <div class="tab" data-tab="upload-resumes">
+        <span class="material-symbols-outlined">upload_file</span>
+        Upload Files
+      </div>
+    </div>
+
+    <!-- TAB 1: GET STARTED -->
+    <div id="start-here" class="tab-content active">
+      <p style="font-size: 14px; margin-bottom: 16px;">Choose how you'd like to add candidates to your ATS:</p>
+
+      <div class="option-card" onclick="showTab('import-data')" style="cursor: pointer;">
+        <h4>
+          <span class="material-symbols-outlined">content_paste</span>
+          Paste from Spreadsheet
+        </h4>
+        <p>Already have candidate info in Excel or Google Sheets? Copy and paste it directly.</p>
+        <div class="tip-box">
+          <span class="material-symbols-outlined">lightbulb</span>
+          <span>Best for: Job fair sign-ups, applicant lists, exported data from other systems.</span>
+        </div>
+      </div>
+
+      <div class="option-card" onclick="showTab('upload-resumes')" style="cursor: pointer;">
+        <h4>
+          <span class="material-symbols-outlined">upload_file</span>
+          Upload Resume Files
+        </h4>
+        <p>Have a batch of resumes? Drop them here and we'll extract candidate information automatically.</p>
+        <div class="tip-box">
+          <span class="material-symbols-outlined">lightbulb</span>
+          <span>Best for: Email attachments, downloaded resumes, career fair handouts.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: PASTE DATA -->
+    <div id="import-data" class="tab-content">
+      <div class="section-title">
+        <span class="material-symbols-outlined">content_paste</span>
+        Paste Your Spreadsheet Data
+      </div>
+
+      <p>Copy rows from Excel, Google Sheets, or any spreadsheet and paste them below.</p>
+
+      <div class="tip-box">
+        <span class="material-symbols-outlined">info</span>
+        <div>
+          <strong>Required columns:</strong> Full Name, Email Address<br>
+          <strong>Optional:</strong> Phone Number, Resume Link, LinkedIn, City, State, etc.
+        </div>
+      </div>
+
+      <h4>How to do it:</h4>
+      <ol>
+        <li>In your spreadsheet, select the header row and all candidate rows</li>
+        <li>Copy (Ctrl+C on Windows, Cmd+C on Mac)</li>
+        <li>Click in the box below and paste (Ctrl+V or Cmd+V)</li>
+      </ol>
+
+      <textarea id="paste-area" rows="8" placeholder="Click here and paste your data...&#10;&#10;Example:&#10;Full Name	Email Address	Phone Number&#10;Jane Smith	jane@email.com	555-123-4567&#10;John Doe	john@email.com	555-987-6543"></textarea>
+
+      <button id="import-btn" class="btn-full" onclick="handleImport()">
+        <span class="material-symbols-outlined">person_add</span>
+        Add Candidates
+      </button>
+
+      <div class="progress-container" id="import-progress">
+        <div class="progress-label">
+          <span>Adding candidates...</span>
+          <span id="import-progress-pct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="import-progress-fill"></div></div>
+      </div>
+
+      <div class="status-message" id="import-status"></div>
+    </div>
+
+    <!-- TAB 3: UPLOAD RESUMES -->
+    <div id="upload-resumes" class="tab-content">
+      <div class="section-title">
+        <span class="material-symbols-outlined">upload_file</span>
+        Upload Resume Files
+      </div>
+
+      <p>Drop your resume files below. We'll scan each file to extract contact information and create candidate records automatically.</p>
+
+      <div class="tip-box" style="margin-bottom: 12px;">
+        <span class="material-symbols-outlined">info</span>
+        <div>
+          <strong>Naming tip:</strong> Candidate names are extracted from filenames. For best results, name your files like <code>John Smith.pdf</code> or <code>Jane Doe Resume.pdf</code>
+        </div>
+      </div>
+
+      <div class="file-types">
+        <span class="file-type-badge">PDF</span>
+        <span class="file-type-badge">DOCX</span>
+        <span class="file-type-badge">DOC</span>
+        <span class="file-type-badge">TXT</span>
+      </div>
+
+      <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.txt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">
+
+      <div class="drop-zone" id="drop-zone">
+        <span class="material-symbols-outlined drop-zone-icon">cloud_upload</span>
+        <div class="drop-zone-text">Drag and drop resume files here</div>
+        <div class="drop-zone-subtext">or <a href="#" id="browse-link">browse to select files</a></div>
+      </div>
+
+      <!-- File list (shown when files are added) -->
+      <div id="file-list-container" style="display: none;">
+        <div class="file-list-header">
+          <span id="file-count">0 files selected</span>
+          <button class="btn-secondary btn-small" onclick="clearFiles()">Clear All</button>
+        </div>
+        <ul class="file-list" id="file-list"></ul>
+      </div>
+
+      <button id="upload-btn" class="btn-full" onclick="processResumes()" disabled>
+        <span class="material-symbols-outlined">person_add</span>
+        Add Candidates from Resumes
+      </button>
+
+      <div class="progress-container" id="upload-progress">
+        <div class="progress-label">
+          <span id="upload-progress-text">Processing files...</span>
+          <span id="upload-progress-pct">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="upload-progress-fill"></div></div>
+      </div>
+
+      <div class="status-message" id="upload-status"></div>
+
+      <div class="tip-box" style="margin-top: 16px;">
+        <span class="material-symbols-outlined">privacy_tip</span>
+        <div>
+          <strong>Your files stay private.</strong> Resume processing happens right in your browser. Files are never uploaded to external servers.
+        </div>
+      </div>
+
+      <!-- URL Paste Section -->
+      <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+        <div class="section-title">
+          <span class="material-symbols-outlined">link</span>
+          Or Paste Resume Links
+        </div>
+
+        <p>Have resumes in Google Drive, Dropbox, or another cloud service? Paste the share links below (one per line).</p>
+
+        <div class="tip-box" style="margin-bottom: 12px;">
+          <span class="material-symbols-outlined">info</span>
+          <div>
+            <strong>Note:</strong> When pasting links only, we can't extract contact info from the files. You'll need to manually add email/phone for these candidates, or use the Paste Data tab with their info.
+          </div>
+        </div>
+
+        <textarea id="url-paste-area" rows="5" placeholder="Paste resume links here, one per line...&#10;&#10;Example:&#10;https://drive.google.com/file/d/abc123/view&#10;https://www.dropbox.com/s/xyz789/resume.pdf"></textarea>
+
+        <button id="url-import-btn" class="btn-full btn-secondary" onclick="processResumeUrls()">
+          <span class="material-symbols-outlined">link</span>
+          Add Candidates from Links
+        </button>
+
+        <div class="progress-container" id="url-progress">
+          <div class="progress-label">
+            <span>Processing links...</span>
+            <span id="url-progress-pct">0%</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="url-progress-fill"></div></div>
+        </div>
+
+        <div class="status-message" id="url-status"></div>
+      </div>
+    </div>
+
+    <script>
+      // Initialize PDF.js worker
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      // State
+      let selectedFiles = [];
+      let isProcessing = false;
+
+      // DOM Elements
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('file-input');
+      const fileListContainer = document.getElementById('file-list-container');
+      const fileList = document.getElementById('file-list');
+      const fileCount = document.getElementById('file-count');
+      const uploadBtn = document.getElementById('upload-btn');
+      const browseLink = document.getElementById('browse-link');
+
+      // Tab switching
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => showTab(tab.dataset.tab));
+      });
+
+      function showTab(tabId) {
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+        tabContents.forEach(c => c.classList.toggle('active', c.id === tabId));
+        // Clear status messages when switching
+        document.querySelectorAll('.status-message').forEach(el => el.classList.remove('show'));
+      }
+
+      // ==================== PASTE DATA TAB ====================
+
+      function parsePastedData(text) {
+        const lines = text.trim().split('\n');
+        if (lines.length < 2) return [];
+        const headers = lines[0].split('\t').map(h => h.trim());
+        const data = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cells = lines[i].split('\t');
+          const rowObj = {};
+          headers.forEach((header, j) => {
+            if (header) rowObj[header] = cells[j] ? cells[j].trim() : '';
+          });
+          data.push(rowObj);
+        }
+        return data;
+      }
+
+      function handleImport() {
+        const text = document.getElementById('paste-area').value;
+        if (!text.trim()) {
+          return showStatus('import-status', 'Please paste your data first.', 'warning');
+        }
+
+        const dataToImport = parsePastedData(text);
+        if (dataToImport.length === 0) {
+          return showStatus('import-status', 'No data found. Make sure you included the header row and at least one candidate row.', 'error');
+        }
+
+        // Check for required columns
+        const firstRow = dataToImport[0];
+        const hasName = firstRow['Full Name'] || firstRow['Name'] || firstRow['full name'] || firstRow['name'];
+        const hasEmail = firstRow['Email Address'] || firstRow['Email'] || firstRow['email address'] || firstRow['email'];
+
+        if (!hasName && !hasEmail) {
+          return showStatus('import-status', 'Missing required columns. Your data should include "Full Name" and "Email Address" columns.', 'error');
+        }
+
+        setImportLoading(true);
+        showStatus('import-status', 'Adding candidates...', 'info');
+
+        google.script.run
+          .withSuccessHandler(onImportSuccess)
+          .withFailureHandler(onImportFailure)
+          .Bulk_Import_AllCandidates(dataToImport);
+      }
+
+      function onImportSuccess(result) {
+        setImportLoading(false);
+
+        // Handle both old (number) and new (object) return formats
+        if (typeof result === 'number') {
+          // Legacy format
+          if (result === 0) {
+            showStatus('import-status', 'No new candidates were added. They may already exist in your database (duplicate emails are skipped).', 'warning');
+          } else {
+            showStatus('import-status', `Successfully added ${result} candidate${result !== 1 ? 's' : ''} to your database.`, 'success');
+            document.getElementById('paste-area').value = '';
+          }
+          return;
+        }
+
+        // New structured result format
+        const { added, skippedDuplicate, skippedNoEmail, total } = result;
+        let message = '';
+        let status = 'success';
+
+        if (added > 0) {
+          message = `Successfully added ${added} candidate${added !== 1 ? 's' : ''} to your database.`;
+        }
+
+        // Add skip information if any
+        const skipped = (skippedDuplicate || 0) + (skippedNoEmail || 0);
+        if (skipped > 0) {
+          const skipDetails = [];
+          if (skippedDuplicate > 0) skipDetails.push(`${skippedDuplicate} duplicate${skippedDuplicate !== 1 ? 's' : ''}`);
+          if (skippedNoEmail > 0) skipDetails.push(`${skippedNoEmail} missing email`);
+          message += ` Skipped: ${skipDetails.join(', ')}.`;
+        }
+
+        if (added === 0) {
+          message = `No new candidates were added. ${skipped > 0 ? `Skipped ${skipped} record${skipped !== 1 ? 's' : ''} (duplicates or missing emails).` : 'All records may already exist in your database.'}`;
+          status = 'warning';
+        }
+
+        showStatus('import-status', message, status);
+        if (added > 0) {
+          document.getElementById('paste-area').value = '';
+        }
+      }
+
+      function onImportFailure(error) {
+        setImportLoading(false);
+        showStatus('import-status', `Error: ${error.message}`, 'error');
+      }
+
+      function setImportLoading(loading) {
+        document.getElementById('import-btn').disabled = loading;
+        document.getElementById('import-progress').classList.toggle('show', loading);
+        if (loading) {
+          document.getElementById('import-progress-fill').style.width = '100%';
+          document.getElementById('import-progress-fill').style.animation = 'progress-pulse 1.5s infinite';
+        } else {
+          document.getElementById('import-progress-fill').style.animation = 'none';
+        }
+      }
+
+      // ==================== UPLOAD RESUMES TAB ====================
+
+      // Drag and drop handlers
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+
+        // Check for Drive URLs in the dataTransfer (when dragging from Drive web UI)
+        const driveUrls = extractDriveUrls(e.dataTransfer);
+
+        if (driveUrls.length > 0 && e.dataTransfer.files.length === 0) {
+          // User dragged from Drive but we don't have file content
+          // We can capture the URLs but can't extract text without the file
+          handleDriveLinks(driveUrls);
+        } else if (driveUrls.length > 0 && e.dataTransfer.files.length > 0) {
+          // We have both Drive URLs and file content - best case
+          handleFilesWithDriveUrls(e.dataTransfer.files, driveUrls);
+        } else {
+          // Local files only - standard handling
+          handleFiles(e.dataTransfer.files);
+        }
+      });
+
+      function extractDriveUrls(dataTransfer) {
+        const urls = [];
+
+        // Try different data types that might contain URLs
+        const types = ['text/uri-list', 'text/plain', 'text/html'];
+        for (const type of types) {
+          try {
+            const data = dataTransfer.getData(type);
+            if (data) {
+              // Look for Google Drive URLs
+              const driveMatches = data.match(/https:\/\/drive\.google\.com\/[^\s"'<>]+/gi) || [];
+              const docsMatches = data.match(/https:\/\/docs\.google\.com\/[^\s"'<>]+/gi) || [];
+              urls.push(...driveMatches, ...docsMatches);
+            }
+          } catch (err) {
+            console.log('Could not read dataTransfer type:', type);
+          }
+        }
+
+        // Deduplicate
+        return [...new Set(urls)];
+      }
+
+      function handleDriveLinks(driveUrls) {
+        // User dragged from Drive web UI - we have URLs but no file content
+        showStatus('upload-status',
+          `Detected ${driveUrls.length} Google Drive file${driveUrls.length !== 1 ? 's' : ''}. ` +
+          `To extract candidate info, please download the file${driveUrls.length !== 1 ? 's' : ''} first, then drag the downloaded file${driveUrls.length !== 1 ? 's' : ''} here. ` +
+          `<br><br><strong>Drive URL${driveUrls.length !== 1 ? 's' : ''} detected:</strong><br>` +
+          driveUrls.map(url => `<a href="${url}" target="_blank" style="word-break: break-all;">${url}</a>`).join('<br>'),
+          'info'
+        );
+        console.log('Drive URLs detected:', driveUrls);
+      }
+
+      function handleFilesWithDriveUrls(files, driveUrls) {
+        // We have both files and Drive URLs - attach URLs to files by index
+        const filesWithUrls = Array.from(files).map((file, index) => {
+          file.driveUrl = driveUrls[index] || null;
+          return file;
+        });
+        handleFiles(files, driveUrls);
+      }
+
+      dropZone.addEventListener('click', () => fileInput.click());
+      browseLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+      function handleFiles(files, driveUrls = []) {
+        const validExtensions = ['.pdf', '.doc', '.docx', '.txt'];
+        const newFiles = Array.from(files).filter(file => {
+          const ext = '.' + file.name.split('.').pop().toLowerCase();
+          return validExtensions.includes(ext);
+        });
+
+        if (newFiles.length < files.length) {
+          const skipped = files.length - newFiles.length;
+          showStatus('upload-status', `${skipped} file${skipped > 1 ? 's were' : ' was'} skipped (unsupported format). Only PDF, DOC, DOCX, and TXT files are accepted.`, 'warning');
+        }
+
+        // Add to selected files (avoid duplicates by name)
+        // Attach Drive URL if available
+        newFiles.forEach((file, index) => {
+          if (!selectedFiles.some(f => f.name === file.name)) {
+            file.driveUrl = driveUrls[index] || null;
+            selectedFiles.push(file);
+          }
+        });
+
+        updateFileList();
+      }
+
+      function updateFileList() {
+        if (selectedFiles.length === 0) {
+          fileListContainer.style.display = 'none';
+          dropZone.classList.remove('has-files');
+          uploadBtn.disabled = true;
+          return;
+        }
+
+        fileListContainer.style.display = 'block';
+        dropZone.classList.add('has-files');
+        uploadBtn.disabled = isProcessing;
+        fileCount.textContent = `${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} selected`;
+
+        fileList.innerHTML = selectedFiles.map((file, index) => `
+          <li class="file-item" data-index="${index}">
+            <span class="material-symbols-outlined">${getFileIcon(file.name)}</span>
+            <span class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
+            <span class="file-status pending" id="status-${index}">Ready</span>
+            <button class="remove-btn" onclick="removeFile(${index})" title="Remove" ${isProcessing ? 'disabled' : ''}>
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </li>
+        `).join('');
+      }
+
+      function getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        if (ext === 'pdf') return 'picture_as_pdf';
+        if (ext === 'doc' || ext === 'docx') return 'description';
+        return 'text_snippet';
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function removeFile(index) {
+        if (isProcessing) return;
+        selectedFiles.splice(index, 1);
+        updateFileList();
+        if (selectedFiles.length === 0) {
+          document.getElementById('upload-status').classList.remove('show');
+        }
+      }
+
+      function clearFiles() {
+        if (isProcessing) return;
+        selectedFiles = [];
+        fileInput.value = '';
+        updateFileList();
+        document.getElementById('upload-status').classList.remove('show');
+      }
+
+      async function processResumes() {
+        if (selectedFiles.length === 0 || isProcessing) return;
+
+        isProcessing = true;
+        uploadBtn.disabled = true;
+        document.getElementById('upload-progress').classList.add('show');
+        document.getElementById('upload-status').classList.remove('show');
+
+        const results = [];
+        let processed = 0;
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          updateFileStatus(i, 'Processing...', 'processing');
+          updateProgress(processed, selectedFiles.length, `Processing: ${file.name}`);
+
+          try {
+            const text = await extractTextFromFile(file);
+            if (text && text.trim()) {
+              results.push({
+                filename: file.name,
+                text: text.substring(0, 100000), // Limit text length
+                driveUrl: file.driveUrl || null  // Include Drive URL if available
+              });
+              updateFileStatus(i, 'Ready', 'success');
+            } else {
+              updateFileStatus(i, 'No text found', 'error');
+            }
+          } catch (error) {
+            console.error('Error processing file:', file.name, error);
+            updateFileStatus(i, 'Failed', 'error');
+          }
+
+          processed++;
+          updateProgress(processed, selectedFiles.length);
+        }
+
+        if (results.length === 0) {
+          isProcessing = false;
+          uploadBtn.disabled = false;
+          document.getElementById('upload-progress').classList.remove('show');
+          showStatus('upload-status', 'Could not extract text from any of the files. Please make sure they contain readable text.', 'error');
+          return;
+        }
+
+        // Send to server for candidate creation
+        updateProgress(100, 100, 'Creating candidate records...');
+
+        google.script.run
+          .withSuccessHandler(onUploadSuccess)
+          .withFailureHandler(onUploadFailure)
+          .processUploadedResumes(results);
+      }
+
+      async function extractTextFromFile(file) {
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (ext === 'txt') {
+          return await file.text();
+        }
+
+        if (ext === 'pdf') {
+          return await extractTextFromPDF(file);
+        }
+
+        if (ext === 'docx') {
+          return await extractTextFromDOCX(file);
+        }
+
+        if (ext === 'doc') {
+          // .doc files are harder to parse client-side
+          // Try to read as text, may not work for all .doc files
+          try {
+            const text = await file.text();
+            // Basic check if it's readable text
+            if (text && /[a-zA-Z]{3,}/.test(text)) {
+              return text;
+            }
+          } catch (e) {}
+          throw new Error('Legacy .doc format - please convert to .docx');
+        }
+
+        throw new Error('Unsupported file format');
+      }
+
+      async function extractTextFromPDF(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let text = '';
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          const pageText = content.items.map(item => item.str).join(' ');
+          text += pageText + '\n';
+        }
+
+        return text;
+      }
+
+      async function extractTextFromDOCX(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+        return result.value;
+      }
+
+      function updateFileStatus(index, text, status) {
+        const statusEl = document.getElementById(`status-${index}`);
+        if (statusEl) {
+          statusEl.textContent = text;
+          statusEl.className = `file-status ${status}`;
+        }
+      }
+
+      function updateProgress(current, total, text) {
+        const pct = Math.round((current / total) * 100);
+        document.getElementById('upload-progress-fill').style.width = `${pct}%`;
+        document.getElementById('upload-progress-pct').textContent = `${pct}%`;
+        if (text) {
+          document.getElementById('upload-progress-text').textContent = text;
+        }
+      }
+
+      function onUploadSuccess(result) {
+        isProcessing = false;
+        document.getElementById('upload-progress').classList.remove('show');
+
+        if (typeof result === 'string') {
+          // Legacy format - just a message
+          showStatus('upload-status', result, 'success');
+        } else {
+          // Structured result with failedFiles details
+          const { linked, created, failed, failedFiles, total } = result;
+          let message = `Processing complete! `;
+          if (linked > 0) message += `${linked} resume${linked !== 1 ? 's' : ''} linked to existing candidates. `;
+          if (created > 0) message += `${created} new candidate${created !== 1 ? 's' : ''} created. `;
+
+          // Show failed file details if any
+          if (failed > 0 && failedFiles && failedFiles.length > 0) {
+            message += `${failed} file${failed !== 1 ? 's' : ''} could not be processed:`;
+            // Create detailed list of failed files (use <br> for HTML display)
+            const failedList = failedFiles.map(f => `• ${f.filename}: ${f.reason}`).join('<br>');
+            message += '<br>' + failedList;
+          } else if (failed > 0) {
+            message += `${failed} file${failed !== 1 ? 's' : ''} could not be matched.`;
+          }
+
+          showStatus('upload-status', message, created > 0 || linked > 0 ? 'success' : 'warning');
+        }
+
+        // Clear files after successful processing
+        selectedFiles = [];
+        fileInput.value = '';
+        updateFileList();
+      }
+
+      function onUploadFailure(error) {
+        isProcessing = false;
+        uploadBtn.disabled = false;
+        document.getElementById('upload-progress').classList.remove('show');
+        showStatus('upload-status', `Error: ${error.message}`, 'error');
+      }
+
+      // ==================== URL PASTE SECTION ====================
+
+      function processResumeUrls() {
+        const text = document.getElementById('url-paste-area').value;
+        if (!text.trim()) {
+          return showStatus('url-status', 'Please paste at least one URL.', 'warning');
+        }
+
+        // Parse URLs from pasted text (one per line)
+        const lines = text.trim().split('\n');
+        const urls = [];
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+
+          // Basic URL validation
+          if (trimmed.match(/^https?:\/\/.+/i)) {
+            urls.push(trimmed);
+          }
+        }
+
+        if (urls.length === 0) {
+          return showStatus('url-status', 'No valid URLs found. URLs should start with http:// or https://', 'error');
+        }
+
+        // Build resume data objects from URLs
+        const resumeData = urls.map(url => ({
+          filename: extractFilenameFromUrl(url),
+          text: '',  // No text content available
+          driveUrl: url
+        }));
+
+        setUrlLoading(true);
+        showStatus('url-status', `Processing ${resumeData.length} link${resumeData.length !== 1 ? 's' : ''}...`, 'info');
+
+        google.script.run
+          .withSuccessHandler(onUrlSuccess)
+          .withFailureHandler(onUrlFailure)
+          .processResumeLinks(resumeData);
+      }
+
+      function extractFilenameFromUrl(url) {
+        try {
+          // Try to extract filename from URL path
+          const urlObj = new URL(url);
+          const pathname = urlObj.pathname;
+
+          // Google Drive: /file/d/{id}/view or /document/d/{id}/edit
+          // The ID isn't helpful for naming, so we'll use a generic name
+          if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+            return 'Google Drive Resume';
+          }
+
+          // Dropbox: usually has filename in path
+          if (url.includes('dropbox.com')) {
+            const parts = pathname.split('/');
+            const lastPart = parts[parts.length - 1];
+            if (lastPart && lastPart.includes('.')) {
+              return decodeURIComponent(lastPart);
+            }
+            return 'Dropbox Resume';
+          }
+
+          // OneDrive or SharePoint
+          if (url.includes('onedrive') || url.includes('sharepoint')) {
+            return 'OneDrive Resume';
+          }
+
+          // Generic: try to get last path segment
+          const segments = pathname.split('/').filter(s => s);
+          if (segments.length > 0) {
+            const last = segments[segments.length - 1];
+            // If it looks like a filename
+            if (last.includes('.')) {
+              return decodeURIComponent(last);
+            }
+          }
+
+          return 'Resume Link';
+        } catch (e) {
+          return 'Resume Link';
+        }
+      }
+
+      function setUrlLoading(loading) {
+        document.getElementById('url-import-btn').disabled = loading;
+        document.getElementById('url-progress').classList.toggle('show', loading);
+        if (loading) {
+          document.getElementById('url-progress-fill').style.width = '100%';
+          document.getElementById('url-progress-fill').style.animation = 'progress-pulse 1.5s infinite';
+        } else {
+          document.getElementById('url-progress-fill').style.animation = 'none';
+        }
+      }
+
+      function onUrlSuccess(result) {
+        setUrlLoading(false);
+
+        const { linked, created, failed, failedFiles, total } = result;
+        let message = `Processing complete! `;
+
+        if (created > 0) {
+          message += `${created} new candidate${created !== 1 ? 's' : ''} created with resume links. `;
+        }
+
+        if (failed > 0) {
+          message += `${failed} link${failed !== 1 ? 's' : ''} could not be processed.`;
+        }
+
+        if (created === 0 && failed === 0) {
+          message = 'No candidates were created. The links may already exist in your database.';
+        }
+
+        showStatus('url-status', message, created > 0 ? 'success' : 'warning');
+
+        if (created > 0) {
+          document.getElementById('url-paste-area').value = '';
+        }
+      }
+
+      function onUrlFailure(error) {
+        setUrlLoading(false);
+        showStatus('url-status', `Error: ${error.message}`, 'error');
+      }
+
+      // ==================== UTILITIES ====================
+
+      function showStatus(elementId, message, type) {
+        const el = document.getElementById(elementId);
+        el.innerHTML = message;
+        el.className = `status-message show ${type}`;
+      }
+    </script>
+
+    <style>
+      @keyframes progress-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+      }
+    </style>
+  </body>
+</html>
